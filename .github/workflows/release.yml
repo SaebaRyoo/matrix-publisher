@@ -12,7 +12,8 @@ jobs:
   build:
     strategy:
       matrix:
-        os: [macos-latest, windows-latest, ubuntu-latest]
+        os: [macos-latest, windows-latest]
+        # ubuntu-latest: 暂时禁用，AppImage 构建失败
     runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v4
