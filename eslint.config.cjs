@@ -8,7 +8,10 @@ module.exports = [
   js.configs.recommended,
   {
     files: ['src/**/*.ts'],
-    languageOptions: { parser: tsParser },
+    languageOptions: {
+      parser: tsParser,
+      globals: { process: 'readonly', __dirname: 'readonly', __filename: 'readonly' }
+    },
     plugins: { '@typescript-eslint': tsPlugin },
     rules: { ...tsPlugin.configs.recommended.rules }
   },

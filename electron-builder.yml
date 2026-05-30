@@ -11,6 +11,10 @@ directories:
 files:
   - out/**/*
   - package.json
+extraResources:
+  - from: ${env.HOME}/.cache/puppeteer
+    to: puppeteer-cache
+    filter: ["**/*"]
 mac:
   target:
     # 生成 .dmg 磁盘映像文件（macOS 标准安装包格式）。支持 x64 和 arm64 架构。
@@ -27,4 +31,5 @@ win:
 #       arch: [x64]
 publish:
   provider: github
+  # release 表示发布到 GitHub Releases，draft: true 表示发布为草稿状态，prerelease: false 表示不是预发布版本
   releaseType: draft

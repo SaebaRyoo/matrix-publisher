@@ -2,7 +2,7 @@
   <el-container style="height: 100vh">
     <el-aside width="200px" style="background: #1e1e2e; border-right: 1px solid #2d2d3f">
       <div style="padding: 20px 16px; color: #cdd6f4; font-weight: 600; font-size: 14px">
-        AI Matrix Publisher
+        Matrix Publisher
       </div>
       <el-menu
         :default-active="$route.path"
@@ -39,10 +39,15 @@
   </el-container>
 </template>
 
-<script setup lang="ts">
-</script>
+<script setup lang="ts"></script>
 
 <style>
-* { box-sizing: border-box; margin: 0; padding: 0; }
-body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; }
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+}
 </style>

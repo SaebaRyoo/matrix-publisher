@@ -28,6 +28,9 @@ jobs:
       - name: Rebuild native modules
         run: npx electron-rebuild -f -w better-sqlite3
 
+      - name: Install Chromium
+        run: npx puppeteer browsers install chrome
+
       - name: Build
         run: npm run build
 

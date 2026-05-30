@@ -1,10 +1,14 @@
 import puppeteer from 'puppeteer-extra'
 import StealthPlugin from 'puppeteer-extra-plugin-stealth'
 import type { Browser } from 'puppeteer'
-// import { app } from 'electron'
-// import path from 'path'
-// import fs from 'fs'
+import path from 'path'
+import { app } from 'electron'
 import log from 'electron-log'
+
+// 打包后把 puppeteer 缓存目录指向 app Resources，开发时用默认缓存
+if (app.isPackaged) {
+  process.env.PUPPETEER_CACHE_DIR = path.join(process.resourcesPath, 'puppeteer-cache')
+}
 
 puppeteer.use(StealthPlugin())
 
@@ -26,10 +30,8 @@ class PuppeteerEngine {
       // const profileDir = this.userDataDir(accountId)
       // this.clearProfileLocks(profileDir)
       const browser = await puppeteer.launch({
-        // 有头模式（显示真实浏览器窗口）比 headless 模式更难被检测，因为 headless 模式有额外的环境差异（如 screen.width = 0）
         headless: false,
         defaultViewport: null,
-        // userDataDir: profileDir,
         args: [
           '--no-sandbox',
           '--disable-setuid-sandbox',
