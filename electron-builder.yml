@@ -1,0 +1,30 @@
+# 应用的唯一标识符，通常使用反向域名格式
+appId: com.matrix.publisher
+# 应用名称
+productName: Matrix Publisher
+
+directories:
+  # 存放构建时所欲额外资源（如图标、证书、脚本）的文件夹路径。这些资源会被复制到打包环境中，但是不会直接打包进最终应用
+  buildResources: build
+  # 打包产物的输出目录。所有生成的安装包、压缩包等都会存放在这里。
+  output: dist/make
+files:
+  - out/**/*
+  - package.json
+mac:
+  target:
+    # 生成 .dmg 磁盘映像文件（macOS 标准安装包格式）。支持 x64 和 arm64 架构。
+    - target: dmg
+      arch: [x64, arm64]
+win:
+  target:
+    # 生成 .exe 安装程序，使用 NSIS（Nullsoft Scriptable Install System）作为安装程序生成器。支持 x64 架构。
+    - target: nsis
+      arch: [x64]
+# linux:
+#   target:
+#     - target: AppImage
+#       arch: [x64]
+publish:
+  provider: github
+  releaseType: draft
