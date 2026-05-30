@@ -1,10 +1,10 @@
-import js from '@eslint/js'
-import tsPlugin from '@typescript-eslint/eslint-plugin'
-import tsParser from '@typescript-eslint/parser'
-import vuePlugin from 'eslint-plugin-vue'
-import vueParser from 'vue-eslint-parser'
+const js = require('@eslint/js')
+const tsPlugin = require('@typescript-eslint/eslint-plugin')
+const tsParser = require('@typescript-eslint/parser')
+const vuePlugin = require('eslint-plugin-vue')
+const vueParser = require('vue-eslint-parser')
 
-export default [
+module.exports = [
   js.configs.recommended,
   {
     files: ['src/**/*.ts'],
@@ -19,6 +19,6 @@ export default [
       parserOptions: { parser: tsParser }
     },
     plugins: { vue: vuePlugin },
-    rules: { ...vuePlugin.configs['vue3-recommended'].rules }
+    rules: { ...vuePlugin.configs['recommended'].rules }
   }
 ]

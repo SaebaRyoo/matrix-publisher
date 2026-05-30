@@ -1,4 +1,3 @@
-import PQueue from 'p-queue'
 import { getDb } from '../data/db'
 import { accountRepo } from '../data/account.repo'
 import { puppeteerEngine } from './puppeteer/engine'
@@ -9,7 +8,23 @@ import type { Task } from '../../shared/types'
 import log from 'electron-log'
 
 // 并发为 1：避免多账号同时操作被风控
-const queue = new PQueue({ concurrency: 1 })
+let running = false
+const pending: (() => Promise<void>)[] = []
+
+const queue = {
+  add(fn: () => Promise<void>) {
+    pending.push(fn)
+    if (!running) drain()
+  }
+}
+
+async function drain() {
+  running = true
+  while (pending.length > 0) {
+    await pending.shift()!().catch(() => {})
+  }
+  running = false
+}
 
 // 用户上传的图片路径（内存中，不持久化）
 const uploadedImages = new Map<number, string[]>()
@@ -40,7 +55,9 @@ export const taskQueue = {
   // 手动重试失败任务
   retry(taskId: number): void {
     getDb()
-      .prepare(`UPDATE tasks SET status='pending', error=NULL, updated_at=datetime('now') WHERE id=?`)
+      .prepare(
+        `UPDATE tasks SET status='pending', error=NULL, updated_at=datetime('now') WHERE id=?`
+      )
       .run(taskId)
     queue.add(() => runTask(taskId))
   },
@@ -52,9 +69,7 @@ export const taskQueue = {
       .all() as Task[]
 
     // 把 running 重置为 pending（上次异常退出）
-    getDb()
-      .prepare(`UPDATE tasks SET status='pending' WHERE status='running'`)
-      .run()
+    getDb().prepare(`UPDATE tasks SET status='pending' WHERE status='running'`).run()
 
     for (const task of pending) {
       queue.add(() => runTask(task.id))
@@ -83,9 +98,9 @@ async function runTask(taskId: number): Promise<void> {
   const account = accountRepo.findById(task.account_id)
   if (!account) return fail(taskId, '找不到对应的账号')
 
-  let imagePaths: string[] = []
   try {
-    const adapter: PlatformAdapter = account.platform === 'douyin' ? douyinAdapter : xiaohongshuAdapter
+    const adapter: PlatformAdapter =
+      account.platform === 'douyin' ? douyinAdapter : xiaohongshuAdapter
     const browser = await puppeteerEngine.acquireBrowser(task.account_id)
     const publishCtx = browser.defaultBrowserContext()
 
@@ -93,15 +108,23 @@ async function runTask(taskId: number): Promise<void> {
     if (!userImages || userImages.length === 0) {
       return fail(taskId, '请先上传图片再发布')
     }
-    imagePaths = userImages
+    const imagePaths = userImages
     uploadedImages.delete(taskId)
 
-    addLog(taskId, `正在发布到${account.platform === 'douyin' ? '抖音' : '小红书'}账号「${account.name}」...`, 'info')
-    const result = await adapter.publish(publishCtx, {
-      title: post.title,
-      body: post.content.slice(0, 1000),
-      images: imagePaths
-    }, task.account_id)
+    addLog(
+      taskId,
+      `正在发布到${account.platform === 'douyin' ? '抖音' : '小红书'}账号「${account.name}」...`,
+      'info'
+    )
+    const result = await adapter.publish(
+      publishCtx,
+      {
+        title: post.title,
+        body: post.content.slice(0, 1000),
+        images: imagePaths
+      },
+      task.account_id
+    )
 
     if (result.success) {
       setStatus(taskId, 'success')

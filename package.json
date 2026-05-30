@@ -23,6 +23,7 @@
   },
   "license": "MIT",
   "devDependencies": {
+    "@eslint/js": "^10.0.1",
     "@types/better-sqlite3": "^7.6.13",
     "@types/dompurify": "^3.2.0",
     "@types/node": "^25.8.0",
@@ -38,8 +39,9 @@
     "prettier": "^3.8.3",
     "simple-git-hooks": "^2.13.1",
     "typescript": "^6.0.3",
-    "vite": "^8.0.13",
+    "vite": "^7.0.0",
     "vitest": "^4.1.6",
+    "vue-eslint-parser": "^10.4.0",
     "vue-tsc": "^3.2.9"
   },
   "packageManager": "yarn@4.14.1",
@@ -58,7 +60,6 @@
     "element-plus": "^2.14.0",
     "marked": "^18.0.3",
     "md-editor-v3": "^6.5.0",
-    "p-queue": "^9.3.0",
     "pinia": "^3.0.4",
     "puppeteer": "^25.0.3",
     "puppeteer-core": "^25.0.3",

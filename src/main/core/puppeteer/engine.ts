@@ -37,8 +37,12 @@ class PuppeteerEngine {
           '--disable-blink-features=AutomationControlled',
           '--no-first-run',
           '--no-default-browser-check',
-          '--disable-features=ChromeWhatsNewUI',
+          '--disable-features=ChromeWhatsNewUI'
         ]
+      })
+      browser.on('disconnected', () => {
+        this.browsers.delete(accountId)
+        log.info(`Browser disconnected for account ${accountId}`)
       })
       this.browsers.set(accountId, browser)
       log.info(`Browser started for account ${accountId}`)
@@ -64,7 +68,9 @@ class PuppeteerEngine {
     return this.browsers.values().next().value ?? null
   }
 
-  async start(): Promise<void> { /* no-op，按需启动 */ }
+  async start(): Promise<void> {
+    /* no-op，按需启动 */
+  }
 }
 
 export const puppeteerEngine = new PuppeteerEngine()
