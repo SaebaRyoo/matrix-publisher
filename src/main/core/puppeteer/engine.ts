@@ -1,24 +1,37 @@
 import puppeteer from 'puppeteer-extra'
 import StealthPlugin from 'puppeteer-extra-plugin-stealth'
 import type { Browser } from 'puppeteer'
-import path from 'path'
 import fs from 'fs'
-import { app } from 'electron'
 import log from 'electron-log'
 
-import { execSync } from 'child_process'
+const CHROME_PATHS: Record<string, string[]> = {
+  darwin: [
+    '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome',
+    '/Applications/Chromium.app/Contents/MacOS/Chromium',
+    '/Applications/Google Chrome Canary.app/Contents/MacOS/Google Chrome Canary'
+  ],
+  win32: [
+    'C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe',
+    'C:\\Program Files (x86)\\Google\\Chrome\\Application\\chrome.exe',
+    `${process.env.LOCALAPPDATA}\\Google\\Chrome\\Application\\chrome.exe`
+  ],
+  linux: ['/usr/bin/google-chrome', '/usr/bin/chromium-browser', '/usr/bin/chromium']
+}
 
-function getExecutablePath(): string | undefined {
-  if (!app.isPackaged) return undefined
-  const chromePath = path.join(process.resourcesPath, 'chrome-path')
-  if (!fs.existsSync(chromePath)) return undefined
-  // CI 写入的是绝对路径，需要转换为相对于 Resources 的路径
-  const absPath = fs.readFileSync(chromePath, 'utf-8').trim()
-  // 把 CI 的绝对路径中 .puppeteer-cache 之后的部分拼到 Resources/puppeteer-cache
-  const marker = '.puppeteer-cache'
-  const idx = absPath.indexOf(marker)
-  if (idx === -1) return undefined
-  return path.join(process.resourcesPath, 'puppeteer-cache', absPath.slice(idx + marker.length + 1))
+function findSystemChrome(): string | undefined {
+  return CHROME_PATHS[process.platform]?.find((p) => fs.existsSync(p))
+}
+
+function getExecutablePath(): string {
+  const chrome = findSystemChrome()
+  if (!chrome) {
+    throw new Error(
+      process.platform === 'win32'
+        ? '未找到 Chrome，请先安装 Google Chrome：https://www.google.com/chrome'
+        : '未找到 Chrome，请先安装 Google Chrome：https://www.google.com/chrome'
+    )
+  }
+  return chrome
 }
 
 puppeteer.use(StealthPlugin())
@@ -41,18 +54,7 @@ class PuppeteerEngine {
       // const profileDir = this.userDataDir(accountId)
       // this.clearProfileLocks(profileDir)
       const executablePath = getExecutablePath()
-      if (executablePath) {
-        log.info(`Using Chrome at: ${executablePath}`)
-        if (process.platform === 'darwin') {
-          // xattr 需要作用在 .app 包上，可执行文件在 .app/Contents/MacOS/ 下，往上三级
-          const appBundle = path.resolve(executablePath, '../../..')
-          try {
-            execSync(`xattr -cr "${appBundle}"`)
-          } catch {
-            /* ignore */
-          }
-        }
-      }
+      log.info(`Using Chrome at: ${executablePath}`)
       const browser = await puppeteer.launch({
         headless: false,
         defaultViewport: null,
