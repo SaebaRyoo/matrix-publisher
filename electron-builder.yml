@@ -12,7 +12,7 @@ files:
   - out/**/*
   - package.json
 extraResources:
-  - from: .puppeteer-cache
+  - from: ${env.PUPPETEER_CACHE_DIR}
     to: puppeteer-cache
     filter: ["**/*"]
 mac:
