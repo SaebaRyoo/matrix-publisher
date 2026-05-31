@@ -15,6 +15,8 @@ extraResources:
   - from: ${env.PUPPETEER_CACHE_DIR}
     to: puppeteer-cache
     filter: ["**/*"]
+  - from: .chrome-path
+    to: chrome-path
 mac:
   target:
     # 生成 .dmg 磁盘映像文件（macOS 标准安装包格式）。支持 x64 和 arm64 架构。

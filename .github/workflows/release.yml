@@ -29,7 +29,9 @@ jobs:
         run: npx electron-rebuild -f -w better-sqlite3
 
       - name: Install Chromium
-        run: npx puppeteer browsers install chrome
+        run: |
+          npx puppeteer browsers install chrome
+          node -e "const p=require('puppeteer'); p.executablePath().then(e=>{require('fs').writeFileSync('.chrome-path',e)})"
         env:
           PUPPETEER_CACHE_DIR: ${{ github.workspace }}/.puppeteer-cache
 
