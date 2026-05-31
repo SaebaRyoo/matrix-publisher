@@ -6,6 +6,8 @@ import fs from 'fs'
 import { app } from 'electron'
 import log from 'electron-log'
 
+import { execSync } from 'child_process'
+
 function getExecutablePath(): string | undefined {
   if (!app.isPackaged) return undefined
   const chromePath = path.join(process.resourcesPath, 'chrome-path')
@@ -39,7 +41,18 @@ class PuppeteerEngine {
       // const profileDir = this.userDataDir(accountId)
       // this.clearProfileLocks(profileDir)
       const executablePath = getExecutablePath()
-      if (executablePath) log.info(`Using Chrome at: ${executablePath}`)
+      if (executablePath) {
+        log.info(`Using Chrome at: ${executablePath}`)
+        if (process.platform === 'darwin') {
+          // xattr 需要作用在 .app 包上，可执行文件在 .app/Contents/MacOS/ 下，往上三级
+          const appBundle = path.resolve(executablePath, '../../..')
+          try {
+            execSync(`xattr -cr "${appBundle}"`)
+          } catch {
+            /* ignore */
+          }
+        }
+      }
       const browser = await puppeteer.launch({
         headless: false,
         defaultViewport: null,
