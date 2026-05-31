@@ -12,7 +12,7 @@ files:
   - out/**/*
   - package.json
 extraResources:
-  - from: ${env.PUPPETEER_CACHE_DIR}
+  - from: .puppeteer-cache
     to: puppeteer-cache
     filter: ["**/*"]
   - from: .chrome-path
