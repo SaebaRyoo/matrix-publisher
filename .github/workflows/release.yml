@@ -30,6 +30,8 @@ jobs:
 
       - name: Install Chromium
         run: npx puppeteer browsers install chrome
+        env:
+          PUPPETEER_CACHE_DIR: ${{ github.workspace }}/.puppeteer-cache
 
       - name: Build
         run: npm run build
@@ -37,4 +39,5 @@ jobs:
       - name: Package
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          PUPPETEER_CACHE_DIR: ${{ github.workspace }}/.puppeteer-cache
         run: npm run make

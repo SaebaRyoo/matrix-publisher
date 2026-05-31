@@ -50,7 +50,7 @@ git push origin v1.0.0
 
 ## 架构说明
 
-- `src/main/` — Electron 主进程（IPC、数据库、任务队列、Puppeteer���
+- `src/main/` — Electron 主进程（IPC、数据库、任务队列、Puppeteer 相关）
 - `src/renderer/` — Vue 3 渲染层
 - `src/preload/` — Preload 脚本，暴露 `window.api`
 - `src/shared/` — 主进程与渲染层共享的类型和常量
